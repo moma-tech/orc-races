@@ -1,12 +1,15 @@
 package space.moma.spring.cloud.orc.races;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import space.moma.spring.cloud.orc.races.dao.Race;
+import space.moma.spring.cloud.orc.races.dao.RaceWithParticipant;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,11 +21,19 @@ import java.util.List;
 @SpringBootApplication
 @RestController
 @EnableEurekaClient
+@EnableFeignClients
 public class OrcRacesApplication implements CommandLineRunner {
-    private static List<Race> races = new ArrayList<Race>();
+    private static List<Race> races = new ArrayList<>();
 
     public static void main(String[] args) {
         SpringApplication.run(OrcRacesApplication.class, args);
+    }
+
+    private ParticipantsClient participantsClient;
+
+    @Autowired
+    OrcRacesApplication(ParticipantsClient participantsClient) {
+        this.participantsClient = participantsClient;
     }
 
     @Override
@@ -35,4 +46,15 @@ public class OrcRacesApplication implements CommandLineRunner {
     public List<Race> getRaces() {
         return races;
     }
+
+    @RequestMapping("/participants")
+    public List<RaceWithParticipant> getRacesWithParticipants() {
+        List<RaceWithParticipant> returnRaces = new ArrayList<>();
+        for (Race r : races) {
+            returnRaces.add(new RaceWithParticipant(r, participantsClient.getparticipants(r.getId())));
+        }
+        return returnRaces;
+    }
+
+
 }
