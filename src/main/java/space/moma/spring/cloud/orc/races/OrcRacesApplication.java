@@ -29,11 +29,11 @@ public class OrcRacesApplication implements CommandLineRunner {
         SpringApplication.run(OrcRacesApplication.class, args);
     }
 
-    private ParticipantsClient participantsClient;
+    private ParticipantsClientService participantsClientService;
 
     @Autowired
-    OrcRacesApplication(ParticipantsClient participantsClient) {
-        this.participantsClient = participantsClient;
+    OrcRacesApplication(ParticipantsClientService participantsClientService) {
+        this.participantsClientService = participantsClientService;
     }
 
     @Override
@@ -51,7 +51,7 @@ public class OrcRacesApplication implements CommandLineRunner {
     public List<RaceWithParticipant> getRacesWithParticipants() {
         List<RaceWithParticipant> returnRaces = new ArrayList<>();
         for (Race r : races) {
-            returnRaces.add(new RaceWithParticipant(r, participantsClient.getparticipants(r.getId())));
+            returnRaces.add(new RaceWithParticipant(r, participantsClientService.getParticipants(r.getId())));
         }
         return returnRaces;
     }
